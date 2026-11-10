@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { playOrderNotificationChime } from '../../utils/notificationSound';
 import { 
   ShoppingBag, 
   Truck, 
@@ -19,6 +22,10 @@ import {
 } from 'lucide-react';
 
 export const VendorOrders = () => {
+  const outletCtx = useOutletContext() || {};
+  const { currentUser } = useAuth();
+  const activeShopId = outletCtx.activeShopId || currentUser?.activeVendorId || 'shop-1';
+
   const [orders, setOrders] = useState([]);
   const [shops, setShops] = useState([]);
   const [shop, setShop] = useState(null);
@@ -34,18 +41,27 @@ export const VendorOrders = () => {
   const [reassigningLoading, setReassigningLoading] = useState(false);
 
   const loadData = async () => {
-    const list = await api.orders.getAll({ shopId: 'shop-1' });
+    const list = await api.orders.getAll({ shopId: activeShopId });
     setOrders(list);
-    const shopData = await api.shops.getById('shop-1');
+    const shopData = await api.shops.getById(activeShopId);
     setShop(shopData);
     setOwnDeliveryFeeInput(shopData?.ownDeliveryFee || 15);
     const allShops = await api.shops.getAll();
-    setShops(allShops.filter(s => s.id !== 'shop-1'));
+    const otherShops = allShops.filter(s => s.id !== activeShopId);
+    setShops(otherShops);
+    if (otherShops[0]) setSelectedTargetShopId(otherShops[0].id);
   };
 
   useEffect(() => {
     loadData();
-  }, []);
+    const handleSync = () => loadData();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('burlamart_db_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('burlamart_db_updated', handleSync);
+    };
+  }, [activeShopId]);
 
   const showToast = (msg) => {
     setStatusNotice(msg);
@@ -54,12 +70,15 @@ export const VendorOrders = () => {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     await api.orders.updateStatus(orderId, newStatus, 'Updated from vendor dispatch dashboard');
+    if (newStatus === 'Shop Confirmed') {
+      playOrderNotificationChime();
+    }
     showToast(`Order #${orderId} marked as "${newStatus}"!`);
     loadData();
   };
 
   const handleToggleOwnDelivery = async (hasOwn) => {
-    await api.shops.updateStorefront('shop-1', {
+    await api.shops.updateStorefront(activeShopId, {
       hasOwnDelivery: hasOwn,
       ownDeliveryFee: Number(ownDeliveryFeeInput)
     });
@@ -248,13 +267,23 @@ export const VendorOrders = () => {
                     </>
                   )}
 
-                  {order.status === 'Shop Confirmed' && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'Picked Up')}
-                      className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-xs transition text-xs"
-                    >
-                      Handover / Mark Picked Up
-                    </button>
+                  {(order.status === 'Shop Confirmed' || order.status === 'Ready for Pickup') && (
+                    <div className="flex flex-wrap gap-2">
+                      {order.status === 'Shop Confirmed' && (
+                        <button
+                          onClick={() => handleUpdateStatus(order.id, 'Ready for Pickup')}
+                          className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold shadow-xs transition text-xs cursor-pointer"
+                        >
+                          Dispatch to Rider (Ready for Pickup)
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleUpdateStatus(order.id, 'Picked Up')}
+                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-xs transition text-xs cursor-pointer"
+                      >
+                        Handover / Mark Picked Up
+                      </button>
+                    </div>
                   )}
 
                   {/* If shop uses own delivery, shop can mark delivered (Page 6 requirement) */}

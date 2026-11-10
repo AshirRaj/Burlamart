@@ -8,7 +8,8 @@ import {
   Gift, 
   FileText, 
   Check, 
-  Save 
+  Save,
+  MapPin
 } from 'lucide-react';
 import { DeliverySlabsConfig } from '../../components/admin/DeliverySlabsConfig';
 import { CartExtrasConfig } from '../../components/admin/CartExtrasConfig';
@@ -16,6 +17,7 @@ import { CoinPricingConfig } from '../../components/admin/CoinPricingConfig';
 import { RankingAlgorithmConfig } from '../../components/admin/RankingAlgorithmConfig';
 import { RewardsAndEmiConfig } from '../../components/admin/RewardsAndEmiConfig';
 import { AuditLogTable } from '../../components/admin/AuditLogTable';
+import { ZoneServiceabilityManager } from '../../components/admin/ZoneServiceabilityManager';
 
 export const PlatformSettings = () => {
   const { platformSettings, updateSettings } = useApp();
@@ -63,6 +65,7 @@ export const PlatformSettings = () => {
       <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2 text-xs font-bold">
         {[
           { id: 'delivery', label: 'Delivery Distance Slabs & Logistics', icon: Truck },
+          { id: 'zones', label: 'Odisha Zones & Cities', icon: MapPin },
           { id: 'cart', label: 'Cart Extras & Packaging Limit W', icon: Package },
           { id: 'coins', label: 'Coin Packs & Pricing', icon: Coins },
           { id: 'ranking', label: 'Ranking Algorithm & Radius', icon: Scale },
@@ -91,6 +94,11 @@ export const PlatformSettings = () => {
         {/* 1. DELIVERY DISTANCE SLABS & FEES */}
         {activeSection === 'delivery' && (
           <DeliverySlabsConfig formData={formData} handleChange={handleChange} />
+        )}
+
+        {/* 1B. ODISHA ZONES & SERVICEABILITY */}
+        {activeSection === 'zones' && (
+          <ZoneServiceabilityManager formData={formData} handleChange={handleChange} />
         )}
 
         {/* 2. CART SURCHARGES & PACKAGING LIMIT W */}

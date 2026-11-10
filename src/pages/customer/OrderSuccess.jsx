@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { CheckCircle2, Gift, ArrowRight, Truck, MapPin } from 'lucide-react';
 import { SpinRewardModal } from '../../components/common/SpinRewardModal';
+import { HotelBookingVoucher } from '../../components/hotels/HotelBookingVoucher';
 
 export const OrderSuccess = () => {
   const { orderId } = useParams();
@@ -60,6 +61,9 @@ export const OrderSuccess = () => {
           </div>
         </div>
       )}
+
+      {/* Hotel Stay Downloadable/Printable QR Booking Voucher */}
+      {order && <HotelBookingVoucher order={order} />}
 
       {/* Spin Reward CTA */}
       <div className="bg-gradient-to-r from-emerald-800 to-[#1B4332] text-white p-5 rounded-3xl shadow-lg flex items-center justify-between gap-3 text-left">

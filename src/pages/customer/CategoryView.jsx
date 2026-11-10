@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { CategoryTemplateRenderer } from '../../components/category-layouts/CategoryTemplateRenderer';
 import { getGroceryCategoryById, GroceryCategoryPage } from '../../components/grocery';
@@ -25,6 +26,7 @@ export const CategoryView = () => {
   const targetShopId = searchParams.get('shopId');
 
   const { categories } = useApp();
+  const { currentRole } = useAuth();
   const [category, setCategory] = useState(null);
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
@@ -147,22 +149,29 @@ export const CategoryView = () => {
           <span className="font-bold text-gray-900 capitalize">{category.name}</span>
         </div>
 
-        {/* Live Template Engine Indicator */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl font-bold">
-            <Layers className="w-3.5 h-3.5 text-emerald-700" />
-            <span>Active Layout: <span className="uppercase text-emerald-800">{category.layoutTemplate}</span></span>
-          </div>
+        {/* Live Template Engine Indicator (Admin only) or Customer Express Badge */}
+        {currentRole === 'admin' ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl font-bold">
+              <Layers className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Active Layout: <span className="uppercase text-emerald-800">{category.layoutTemplate}</span></span>
+            </div>
 
-          <Link
-            to="/admin/templates"
-            className="hidden md:flex items-center gap-1 text-[11px] text-gray-500 hover:text-purple-700 bg-gray-50 hover:bg-purple-50 px-2.5 py-1 rounded-xl border border-gray-200 transition"
-            title="Admins can change this category's layout template here"
-          >
-            <Settings className="w-3 h-3 text-purple-600" />
-            <span>Configure Template in Admin</span>
-          </Link>
-        </div>
+            <Link
+              to="/admin/templates"
+              className="hidden md:flex items-center gap-1 text-[11px] text-gray-500 hover:text-purple-700 bg-gray-50 hover:bg-purple-50 px-2.5 py-1 rounded-xl border border-gray-200 transition"
+              title="Admins can change this category's layout template here"
+            >
+              <Settings className="w-3 h-3 text-purple-600" />
+              <span>Configure Template in Admin</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+            <span>10-Min Hyperlocal Express • Burla & Sambalpur</span>
+          </div>
+        )}
       </div>
 
       {/* Automatic Nearest Store Routing (User is never asked to choose seller) */}

@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Sparkles, Plus, Check, ShoppingBag, Eye, Heart, ArrowRight, Flame, PackageCheck, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Sparkles, Plus, Minus, Check, ShoppingBag, Eye, Heart, ArrowRight, Flame, PackageCheck, Zap, ExternalLink } from 'lucide-react';
 import { PackagedProductCard } from './PackagedProductCard';
 import { FREQUENTLY_BOUGHT_TOGETHER } from '../../data/packagedFoodData';
 
 export const PackagedAdditionalSections = ({
   allProducts,
+  getItemQuantity,
+  onAddToCart,
+  onUpdateQuantity,
   onOpenProductModal,
   wishlistIds,
   onToggleWishlist,
@@ -226,7 +230,7 @@ export const PackagedAdditionalSections = ({
                   )}
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <span className="text-xs text-gray-500">{combo.weight}</span>
                     <div className="flex items-baseline gap-2">
@@ -237,12 +241,43 @@ export const PackagedAdditionalSections = ({
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => onOpenProductModal && onOpenProductModal(combo)}
-                    className="px-4 py-2 rounded-xl bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95"
-                  >
-                    Quick Add
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={`/product/${combo.id}`}
+                      className="p-2 rounded-xl border border-gray-200 hover:border-[#1B4332] text-gray-600 hover:text-[#1B4332] transition"
+                      title="Open Product Page"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+
+                    {(getItemQuantity ? getItemQuantity(combo.id) : 0) > 0 ? (
+                      <div className="flex items-center bg-[#1B4332] text-white rounded-xl shadow-xs overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => onUpdateQuantity && onUpdateQuantity(combo, getItemQuantity(combo.id) - 1)}
+                          className="px-2.5 py-2 hover:bg-[#2D6A4F] transition cursor-pointer"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="px-2 font-black text-xs">{getItemQuantity(combo.id)}</span>
+                        <button
+                          type="button"
+                          onClick={() => onUpdateQuantity && onUpdateQuantity(combo, getItemQuantity(combo.id) + 1)}
+                          className="px-2.5 py-2 hover:bg-[#2D6A4F] transition cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onAddToCart && onAddToCart(combo)}
+                        className="px-4 py-2 rounded-xl bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Add Combo
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -273,8 +308,10 @@ export const PackagedAdditionalSections = ({
               <PackagedProductCard
                 key={`bestseller-${product.id}`}
                 product={product}
-                shop={shop}
-                onOpenModal={onOpenProductModal}
+                quantity={getItemQuantity ? getItemQuantity(product.id) : 0}
+                onAddToCart={onAddToCart}
+                onUpdateQuantity={onUpdateQuantity}
+                onOpenDetails={onOpenProductModal}
                 isWishlisted={wishlistIds.includes(product.id)}
                 onToggleWishlist={onToggleWishlist}
               />

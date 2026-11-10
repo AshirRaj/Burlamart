@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import burlaLogo from '../../assets/burla.png';
+import { HeaderSearchDropdown } from './HeaderSearchDropdown';
 import { useCart } from '../../context/CartContext';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -28,9 +29,21 @@ export const CustomerHeader = () => {
   const { sharedWalletBalance, language, setLanguage, categories } = useApp();
   const { currentRole, currentUser, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const searchWrapperRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
 
   // Rotating placeholder like Blinkit
   const searchPlaceholders = [
@@ -56,6 +69,7 @@ export const CustomerHeader = () => {
 
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
+    setShowSuggestions(false);
     const query = searchQuery.trim() || searchPlaceholders[placeholderIndex].replace(/Search |"/g, '');
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
@@ -72,7 +86,7 @@ export const CustomerHeader = () => {
   const roleBadge = getRoleBadge();
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm w-full max-w-full overflow-hidden">
+    <header ref={searchWrapperRef} className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm w-full max-w-full">
       {/* Top micro bar for announcements & pass - strict overflow containment */}
       <div className="bg-[#1B4332] text-white text-[11px] px-3 sm:px-4 py-1.5 flex items-center justify-between gap-2 overflow-hidden w-full">
         <div className="flex items-center gap-2 truncate min-w-0">
@@ -147,7 +161,13 @@ export const CustomerHeader = () => {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => {
+                  if (searchQuery.trim()) setShowSuggestions(true);
+                }}
                 placeholder={searchPlaceholders[placeholderIndex]}
                 className="w-full bg-gray-100/90 focus:bg-white text-xs sm:text-sm pl-9 pr-20 py-2 rounded-full border border-gray-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none transition placeholder-gray-400 font-medium"
               />
@@ -168,6 +188,12 @@ export const CustomerHeader = () => {
                 </button>
               </div>
             </div>
+            <HeaderSearchDropdown
+              query={searchQuery}
+              isOpen={showSuggestions}
+              onClose={() => setShowSuggestions(false)}
+              onSelectQuery={(q) => setSearchQuery(q)}
+            />
           </form>
 
           {/* Right Action Icons: Login / Profile, Language, Cart */}
@@ -221,7 +247,13 @@ export const CustomerHeader = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => {
+                if (searchQuery.trim()) setShowSuggestions(true);
+              }}
               placeholder={searchPlaceholders[placeholderIndex]}
               className="w-full bg-gray-100/90 text-xs pl-8 pr-16 py-2 rounded-full border border-gray-200 focus:bg-white focus:border-emerald-600 outline-none placeholder-gray-400 font-medium"
             />
@@ -242,6 +274,12 @@ export const CustomerHeader = () => {
               </button>
             </div>
           </div>
+          <HeaderSearchDropdown
+            query={searchQuery}
+            isOpen={showSuggestions}
+            onClose={() => setShowSuggestions(false)}
+            onSelectQuery={(q) => setSearchQuery(q)}
+          />
         </form>
       </div>
 

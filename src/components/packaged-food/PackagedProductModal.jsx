@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { X, Star, Plus, Minus, ShieldCheck, Heart, Clock, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { X, Star, Plus, Minus, ShieldCheck, Heart, Clock, Sparkles, ExternalLink } from 'lucide-react';
 
 export const PackagedProductModal = ({
   product,
@@ -158,11 +159,21 @@ export const PackagedProductModal = ({
               )}
             </div>
 
-            {/* Bottom Add to Cart Bar */}
-            <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Delivering in 10 mins</span>
+            {/* Bottom Add to Cart Bar & Product Page Link */}
+            <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>10 mins</span>
+                </div>
+                <Link
+                  to={`/product/${product.id}`}
+                  onClick={onClose}
+                  className="text-xs font-bold text-[#1B4332] hover:underline flex items-center gap-1"
+                >
+                  <span>Full Page</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
               </div>
 
               <div>

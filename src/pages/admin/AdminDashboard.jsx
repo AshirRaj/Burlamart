@@ -15,21 +15,33 @@ import {
   Sparkles,
   ExternalLink
 } from 'lucide-react';
+import { AdminAnalyticsSection } from '../../components/admin/AdminAnalyticsSection';
 
 export const AdminDashboard = () => {
   const { categories, platformSettings } = useApp();
   const [vendors, setVendors] = useState([]);
   const [orders, setOrders] = useState([]);
 
+  const fetchData = async () => {
+    const v = await api.shops.getAll();
+    setVendors(v);
+    const o = await api.orders.getAll();
+    setOrders(o);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const v = await api.shops.getAll();
-      setVendors(v);
-      const o = await api.orders.getAll();
-      setOrders(o);
-    };
     fetchData();
+    const handleSync = () => fetchData();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('burlamart_db_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('burlamart_db_updated', handleSync);
+    };
   }, []);
+
+  const liveGmv = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+  const deliveredOrders = orders.filter(o => o.status === 'Delivered').length;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -60,9 +72,9 @@ export const AdminDashboard = () => {
       {/* 4 Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs">
-          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Gross Platform GMV</span>
-          <div className="text-2xl font-extrabold text-gray-900 mt-1">₹8,45,200</div>
-          <div className="text-[11px] text-emerald-700 font-bold mt-1">+24% vs last month</div>
+          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Live Platform GMV</span>
+          <div className="text-2xl font-extrabold text-gray-900 mt-1">₹{liveGmv.toLocaleString('en-IN')}</div>
+          <div className="text-[11px] text-emerald-700 font-bold mt-1">{deliveredOrders} settled deliveries</div>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs">
@@ -83,6 +95,14 @@ export const AdminDashboard = () => {
           <div className="text-[11px] text-emerald-700 font-bold mt-1">Active fulfillment running</div>
         </div>
       </div>
+
+      {/* Live Analytics Section */}
+      <AdminAnalyticsSection
+        orders={orders}
+        vendors={vendors}
+        categories={categories}
+        platformSettings={platformSettings}
+      />
 
       {/* Quick Action Portals */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

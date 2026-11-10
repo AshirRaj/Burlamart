@@ -30,7 +30,7 @@ export const RiderLayout = () => {
     phone: '+91 98111 22334',
     email: 'deepak.kumar@rider.burlamart.com',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    vehicle: 'Hero Splendor Plus (RJ-14-AB-4021)',
+    vehicle: 'Hero Splendor Plus (OD-15-AB-4021)',
     vehicleType: 'Two Wheeler (Motorcycle)',
     rating: 4.85,
     totalRatings: 412,
@@ -38,9 +38,9 @@ export const RiderLayout = () => {
     acceptanceRate: '96.2%',
     onTimeRate: '98.4%',
     currentShift: 'Morning Shift (07:00 AM - 03:30 PM)',
-    activeZone: 'Jaipur Central: Civil Lines, Malviya Nagar & C-Scheme',
+    activeZone: 'Burla & Sambalpur Central: VSSUT, Jyoti Vihar & Khetrajpur',
     kycStatus: 'Verified (Aadhaar & PAN)',
-    dlNumber: 'RJ-14-2019-0089214',
+    dlNumber: 'OD-15-2019-0089214',
     dlExpiry: '15 Aug 2031',
     insuranceExpiry: '24 Oct 2027',
     bankAccount: 'HDFC Bank (A/c ****4012)',
@@ -129,7 +129,7 @@ export const RiderLayout = () => {
       </header>
 
       {/* Main Outlet */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 pb-16">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 pb-24 sm:pb-16">
         <Outlet context={{ isOnline, setIsOnline, riderProfile }} />
       </main>
     </div>

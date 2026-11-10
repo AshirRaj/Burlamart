@@ -30,14 +30,15 @@ import {
 import { Link } from 'react-router-dom';
 
 const DEFAULT_SNACK_SHOP = {
-  id: 'burlamart-express-hub',
-  name: 'Burlamart Express Snack Hub (Burla & Sambalpur)',
-  distanceKm: 1.2
+  id: 'shop-5',
+  name: 'Craving Junction Snacks & Combos (Burla & Sambalpur)',
+  category: 'packaged-food',
+  distanceKm: 0.9
 };
 
 export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryName }) => {
   const currentEffectiveShop = shop || DEFAULT_SNACK_SHOP;
-  const { cartItems, addToCart, updateQuantity, subtotal, totalQuantity } = useCart();
+  const { cartItems, addToCart, updateQuantity } = useCart();
 
   // Combine default packaged food data with any passed from props
   const allProducts = useMemo(() => {
@@ -84,13 +85,15 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
   const [wishlistIds, setWishlistIds] = useState(() => {
     try {
       const saved = localStorage.getItem('burlamart_packaged_wishlist');
-      return saved ? JSON.parse(saved) : ['chip-1', 'choc-1', 'bisc-2'];
+      return saved ? JSON.parse(saved) : ['pkg-1', 'pkg-12', 'pkg-6'];
     } catch (e) {
-      return ['chip-1', 'choc-1', 'bisc-2'];
+      return ['pkg-1', 'pkg-12', 'pkg-6'];
     }
   });
 
-  const toggleWishlist = (productId) => {
+  const toggleWishlist = (productOrId) => {
+    const productId = typeof productOrId === 'string' ? productOrId : productOrId?.id;
+    if (!productId) return;
     setWishlistIds(prev => {
       let updated;
       if (prev.includes(productId)) {
@@ -105,6 +108,32 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
       } catch (e) {}
       return updated;
     });
+  };
+
+  // Cart action helpers synced directly with CartContext
+  const getItemQuantity = (productId) => {
+    const item = cartItems.find(i => i.id === productId);
+    return item ? item.quantity : 0;
+  };
+
+  const handleAddProductToCart = (product) => {
+    const normalized = {
+      ...product,
+      category: 'packaged-food',
+      shopId: currentEffectiveShop.id,
+      weightKg: product.weightKg || 0.25
+    };
+    const added = addToCart(normalized, currentEffectiveShop);
+    if (added !== false) {
+      showToast(`Added ${product.name} to cart! 🛍️`, 'success');
+    }
+  };
+
+  const handleUpdateProductQuantity = (product, nextQty) => {
+    updateQuantity(product.id, nextQty);
+    if (nextQty <= 0) {
+      showToast(`Removed ${product.name} from cart`, 'info');
+    }
   };
 
   const wishlistedProducts = useMemo(() => {
@@ -139,7 +168,13 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
   const handleBatchAddToCart = (items) => {
     let addedCount = 0;
     items.forEach(item => {
-      addToCart(item, currentEffectiveShop);
+      const normalized = {
+        ...item,
+        category: 'packaged-food',
+        shopId: currentEffectiveShop.id,
+        weightKg: item.weightKg || 0.25
+      };
+      addToCart(normalized, currentEffectiveShop);
       addedCount++;
     });
     showToast(`Added ${addedCount} items to your cart! 🛍️`, 'success');
@@ -246,41 +281,16 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
         </div>
       )}
 
-      {/* Floating Action Controls (Wishlist & Cart Access) */}
-      <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
-        {/* Wishlist Floating Button */}
+      {/* Floating Wishlist Trigger (Desktop Bottom-Left; Cart handled globally by PersistentCartBar & MobileBottomNav) */}
+      <div className="hidden sm:flex fixed bottom-6 left-6 z-40 items-center">
         <button
           onClick={() => setIsWishlistOpen(true)}
-          className="relative w-12 h-12 rounded-full bg-white text-[#1B4332] border border-gray-200/80 shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center cursor-pointer group"
-          title="View Wishlist"
+          className="relative flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-[#1B4332] border border-gray-200/90 shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer group"
+          title="View Saved Wishlist"
         >
-          <Heart className="w-5 h-5 group-hover:text-red-500 group-hover:scale-110 transition-transform" />
-          {wishlistIds.length > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-extrabold flex items-center justify-center shadow-xs">
-              {wishlistIds.length}
-            </span>
-          )}
+          <Heart className="w-4 h-4 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
+          <span className="text-xs font-extrabold">Saved ({wishlistIds.length})</span>
         </button>
-
-        {/* Quick Cart Floating Pill */}
-        {totalQuantity > 0 && (
-          <Link
-            to="/cart"
-            className="flex items-center gap-3 px-4 py-3 rounded-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white shadow-xl hover:shadow-2xl hover:scale-105 transition cursor-pointer group active:scale-95"
-          >
-            <div className="relative">
-              <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" />
-              <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-amber-400 text-gray-900 text-[10px] font-black flex items-center justify-center">
-                {totalQuantity}
-              </span>
-            </div>
-            <div className="text-left pr-1">
-              <div className="text-[10px] uppercase font-bold text-emerald-200 tracking-wider">Cart Total</div>
-              <div className="text-xs font-black">₹{subtotal} • View</div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-emerald-300 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        )}
       </div>
 
       {/* 1. ANIMATED HERO SECTION */}
@@ -340,8 +350,18 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
                 Crispy chips, gourmet cookies, tea-time namkeen and late-night cravings
               </p>
             </div>
-            <div className="text-xs font-semibold text-gray-500">
-              Showing <span className="font-bold text-[#1B4332]">{filteredProducts.length}</span> curated snacks
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsWishlistOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-rose-200 text-rose-600 text-xs font-bold shadow-2xs hover:bg-rose-50 transition cursor-pointer"
+              >
+                <Heart className="w-3.5 h-3.5 fill-rose-500" />
+                <span>Saved ({wishlistIds.length})</span>
+              </button>
+              <div className="text-xs font-semibold text-gray-500">
+                Showing <span className="font-bold text-[#1B4332]">{filteredProducts.length}</span> curated snacks
+              </div>
             </div>
           </div>
 
@@ -370,8 +390,10 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
                 <PackagedProductCard
                   key={product.id}
                   product={product}
-                  shop={currentEffectiveShop}
-                  onOpenModal={handleOpenProductModal}
+                  quantity={getItemQuantity(product.id)}
+                  onAddToCart={handleAddProductToCart}
+                  onUpdateQuantity={handleUpdateProductQuantity}
+                  onOpenDetails={handleOpenProductModal}
                   isWishlisted={wishlistIds.includes(product.id)}
                   onToggleWishlist={toggleWishlist}
                 />
@@ -399,6 +421,9 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
         {/* 7. ADDITIONAL SECTIONS (FREQUENTLY BOUGHT TOGETHER, COMBOS, BESTSELLERS, RECENTLY VIEWED) */}
         <PackagedAdditionalSections
           allProducts={allProducts}
+          getItemQuantity={getItemQuantity}
+          onAddToCart={handleAddProductToCart}
+          onUpdateQuantity={handleUpdateProductQuantity}
           onOpenProductModal={handleOpenProductModal}
           wishlistIds={wishlistIds}
           onToggleWishlist={toggleWishlist}
@@ -411,9 +436,10 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
       {/* PRODUCT DETAILS MODAL */}
       <PackagedProductModal
         product={selectedProductForModal}
-        isOpen={Boolean(selectedProductForModal)}
         onClose={() => setSelectedProductForModal(null)}
-        shop={currentEffectiveShop}
+        quantity={selectedProductForModal ? getItemQuantity(selectedProductForModal.id) : 0}
+        onAddToCart={handleAddProductToCart}
+        onUpdateQuantity={handleUpdateProductQuantity}
         isWishlisted={selectedProductForModal ? wishlistIds.includes(selectedProductForModal.id) : false}
         onToggleWishlist={toggleWishlist}
       />
@@ -422,11 +448,9 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
       <PackagedWishlistDrawer
         isOpen={isWishlistOpen}
         onClose={() => setIsWishlistOpen(false)}
-        wishlistProducts={wishlistedProducts}
+        wishlist={wishlistedProducts}
         onRemoveFromWishlist={toggleWishlist}
-        onMoveAllToCart={handleBatchAddToCart}
-        onOpenProductModal={handleOpenProductModal}
-        shop={currentEffectiveShop}
+        onAddToCart={handleAddProductToCart}
       />
     </div>
   );

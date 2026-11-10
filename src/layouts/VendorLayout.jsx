@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
+import { playOrderNotificationChime } from '../utils/notificationSound';
 import { 
   LayoutDashboard, 
   Package, 
@@ -23,8 +25,42 @@ import {
 export const VendorLayout = () => {
   const location = useLocation();
   const { vendorCoinBalance } = useApp();
-  const { currentUser } = useAuth();
+  const { currentUser, switchVendorShop } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shops, setShops] = useState([]);
+  const [newOrderAlert, setNewOrderAlert] = useState(null);
+  const prevOrderCountRef = useRef(null);
+
+  const activeShopId = currentUser?.activeVendorId || 'shop-1';
+  const activeShop = shops.find(s => s.id === activeShopId) || shops[0];
+  const displayShopName = activeShop?.name || currentUser?.shopName || 'Burlamart Fresh Supermart';
+  const displayShopCategory = activeShop?.category || currentUser?.activeVendorCategory || 'grocery';
+
+  useEffect(() => {
+    api.shops.getAll().then(list => setShops(list || []));
+  }, []);
+
+  // Listen for live customer orders and play subtle sound alert
+  useEffect(() => {
+    const checkOrders = async () => {
+      const shopOrders = await api.orders.getAll({ shopId: activeShopId });
+      if (prevOrderCountRef.current !== null && shopOrders.length > prevOrderCountRef.current) {
+        const latest = shopOrders[0];
+        playOrderNotificationChime();
+        setNewOrderAlert(`New order #${latest?.id} (₹${latest?.totalAmount}) received!`);
+        setTimeout(() => setNewOrderAlert(null), 5000);
+      }
+      prevOrderCountRef.current = shopOrders.length;
+    };
+    checkOrders();
+    const handleSync = () => checkOrders();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('burlamart_db_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('burlamart_db_updated', handleSync);
+    };
+  }, [activeShopId]);
 
   const navItems = [
     { path: '/vendor', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -60,7 +96,7 @@ export const VendorLayout = () => {
             </div>
             <div>
               <span className="font-extrabold text-xs block leading-none">Vendor Portal</span>
-              <span className="text-[10px] text-emerald-300">Fresh Mandi</span>
+              <span className="text-[10px] text-emerald-300 truncate max-w-[130px] block">{displayShopName}</span>
             </div>
           </div>
         </div>
@@ -130,7 +166,7 @@ export const VendorLayout = () => {
             </div>
             <div>
               <h2 className="font-extrabold text-sm text-white tracking-tight">Vendor Portal</h2>
-              <span className="text-[11px] text-emerald-300 font-semibold block">Fresh Supermart</span>
+              <span className="text-[11px] text-emerald-300 font-semibold block truncate max-w-[150px]">{displayShopName}</span>
             </div>
           </div>
 
@@ -182,17 +218,40 @@ export const VendorLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-xs">
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
           <div>
             <h1 className="text-base sm:text-lg font-extrabold text-gray-900 leading-tight">
-              Burlamart Merchant Suite
+              {displayShopName}
             </h1>
             <p className="text-[11px] sm:text-xs text-gray-500 truncate max-w-xs sm:max-w-md">
-              Logged in as: {currentUser.name} (Owner) • Shop ID: shop-1
+              Logged in as: {currentUser?.name} (Owner) • ID: {activeShopId} • Category: {displayShopCategory}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {newOrderAlert && (
+              <div className="bg-amber-50 border border-amber-300 text-amber-900 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 animate-pulse">
+                <Bell className="w-3.5 h-3.5 text-amber-600" />
+                <span>{newOrderAlert}</span>
+              </div>
+            )}
+
+            {shops.length > 0 && (
+              <select
+                value={activeShopId}
+                onChange={(e) => {
+                  const chosen = shops.find(s => s.id === e.target.value);
+                  if (chosen) switchVendorShop(chosen);
+                }}
+                className="px-2.5 py-1.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700 focus:outline-none focus:border-emerald-600 cursor-pointer max-w-[180px]"
+                title="Switch Active Storefront"
+              >
+                {shops.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            )}
+
             <span className="hidden sm:flex bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
               Store Open
@@ -208,7 +267,7 @@ export const VendorLayout = () => {
         </header>
 
         <main className="p-3 sm:p-6 flex-1 pb-16 overflow-y-auto">
-          <Outlet />
+          <Outlet context={{ activeShopId, activeShop, displayShopName, displayShopCategory }} />
         </main>
       </div>
     </div>

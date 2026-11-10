@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+import { VendorHotelCalendar } from '../../components/vendor/VendorHotelCalendar';
 import { 
   Package, 
   Plus, 
@@ -17,20 +20,31 @@ import {
 } from 'lucide-react';
 
 export const VendorCatalogue = () => {
+  const outletCtx = useOutletContext() || {};
+  const { currentUser } = useAuth();
+  const activeShopId = outletCtx.activeShopId || currentUser?.activeVendorId || 'shop-1';
+  const activeShopName = outletCtx.displayShopName || currentUser?.shopName || 'Burlamart Partner Store';
+  const activeCategory = outletCtx.displayShopCategory || 'grocery';
+
   const { vendorCoinBalance, spendVendorCoins } = useApp();
   const [products, setProducts] = useState([]);
   const [masterTemplates, setMasterTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [catalogueMode, setCatalogueMode] = useState(activeCategory === 'hotels-services' ? 'hotel-slots' : 'skus');
   const [showProductModal, setShowProductModal] = useState(false);
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [notice, setNotice] = useState(null);
 
+  useEffect(() => {
+    setCatalogueMode(activeCategory === 'hotels-services' ? 'hotel-slots' : 'skus');
+  }, [activeCategory]);
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    category: 'grocery',
+    category: activeCategory || 'grocery',
     price: '',
     mrp: '',
     stock: 20,
@@ -42,7 +56,7 @@ export const VendorCatalogue = () => {
   });
 
   const loadData = async () => {
-    const prods = await api.products.getAll({ shopId: 'shop-1' });
+    const prods = await api.products.getAll({ shopId: activeShopId });
     setProducts(prods);
     const tmpls = await api.masterTemplates.getAll();
     setMasterTemplates(tmpls);
@@ -50,7 +64,7 @@ export const VendorCatalogue = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [activeShopId]);
 
   const showToast = (msg) => {
     setNotice(msg);
@@ -92,7 +106,7 @@ export const VendorCatalogue = () => {
       mrp: formData.mrp ? Number(formData.mrp) : Number(formData.price),
       stock: Number(formData.stock),
       weightKg: Number(formData.weightKg),
-      shopId: 'shop-1'
+      shopId: activeShopId
     };
 
     if (editingProduct) {
@@ -180,6 +194,23 @@ export const VendorCatalogue = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => setCatalogueMode('skus')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${catalogueMode === 'skus' ? 'bg-white text-[#1B4332] shadow-2xs' : 'text-gray-500'}`}
+            >
+              SKU Catalogue
+            </button>
+            <button
+              type="button"
+              onClick={() => setCatalogueMode('hotel-slots')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${catalogueMode === 'hotel-slots' ? 'bg-white text-[#e01933] shadow-2xs' : 'text-gray-500'}`}
+            >
+              Room Calendar & Slots
+            </button>
+          </div>
+
           <button
             onClick={handleScanBarcode}
             className="px-3.5 py-2 bg-purple-50 text-purple-900 hover:bg-purple-100 rounded-xl text-xs font-bold border border-purple-200 transition flex items-center gap-1.5"
@@ -211,6 +242,10 @@ export const VendorCatalogue = () => {
           <Check className="w-4 h-4 text-emerald-700" />
           <span>{notice}</span>
         </div>
+      )}
+
+      {catalogueMode === 'hotel-slots' && (
+        <VendorHotelCalendar shopName={activeShopName} onNotify={showToast} />
       )}
 
       {/* Admin Master Templates Ribbon (Section 8.2 & Page 9) */}

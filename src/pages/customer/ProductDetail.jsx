@@ -176,7 +176,7 @@ export const ProductDetail = () => {
     );
   };
 
-  if (loading || !product) {
+  if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center text-gray-500">
         <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -184,6 +184,26 @@ export const ProductDetail = () => {
       </div>
     );
   }
+
+  if (!product) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-4">
+        <h2 className="text-2xl font-black text-gray-900">Product Not Found</h2>
+        <p className="text-sm text-gray-500">
+          This item may have been removed or is currently unavailable.
+        </p>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B4332] text-white rounded-xl text-xs font-bold hover:bg-[#2D6A4F] transition"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </Link>
+      </div>
+    );
+  }
+
+  const effectiveMrp = product.mrp || product.originalPrice || product.price;
+  const effectiveDiscountPct = product.discountPct || (effectiveMrp > product.price ? Math.round(((effectiveMrp - product.price) / effectiveMrp) * 100) : 0);
 
   const galleryList = product.gallery && product.gallery.length > 0 
     ? product.gallery 
@@ -271,7 +291,7 @@ export const ProductDetail = () => {
               <div className="flex items-center gap-1 bg-amber-50 text-amber-900 text-xs font-bold px-2.5 py-0.5 rounded">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                 <span>{product.rating}</span>
-                <span className="text-gray-400 font-normal">({product.reviewsCount} reviews)</span>
+                <span className="text-gray-400 font-normal">({product.reviewsCount || product.reviewCount || 120} reviews)</span>
               </div>
             </div>
 
@@ -280,7 +300,7 @@ export const ProductDetail = () => {
             </h1>
 
             <div className="text-xs text-gray-500 font-medium">
-              Net Quantity / Specification: <strong className="text-gray-800">{product.weightDisplay || '1 unit'}</strong>
+              Net Quantity / Specification: <strong className="text-gray-800">{product.weightDisplay || product.weight || '1 unit'}</strong>
             </div>
           </div>
 
@@ -290,14 +310,14 @@ export const ProductDetail = () => {
               <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.mrp && product.mrp > product.price && (
+              {effectiveMrp > product.price && (
                 <span className="text-sm text-gray-400 line-through">
-                  ₹{product.mrp.toLocaleString()}
+                  ₹{effectiveMrp.toLocaleString()}
                 </span>
               )}
-              {product.discountPct && (
+              {effectiveDiscountPct > 0 && (
                 <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                  Save ₹{(product.mrp - product.price).toLocaleString()} ({product.discountPct}% OFF)
+                  Save ₹{(effectiveMrp - product.price).toLocaleString()} ({effectiveDiscountPct}% OFF)
                 </span>
               )}
             </div>

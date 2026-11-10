@@ -1,5 +1,6 @@
 import React from 'react';
-import { Star, Plus, Minus, Heart, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Star, Plus, Minus, Heart, Eye, ExternalLink } from 'lucide-react';
 
 export const PackagedProductCard = ({
   product,
@@ -16,16 +17,16 @@ export const PackagedProductCard = ({
 
   return (
     <div className="group bg-white rounded-3xl border border-gray-200/80 hover:border-emerald-300 p-3 sm:p-4 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
-      {/* 1. Card Top Badge & Wishlist Button */}
-      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FBF9F5] mb-3 flex items-center justify-center cursor-pointer"
-        onClick={() => onOpenDetails(product)}
-      >
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
+      {/* 1. Card Top Image -> Opens Full Product Page */}
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FBF9F5] mb-3 flex items-center justify-center">
+        <Link to={`/product/${product.id}`} className="w-full h-full block">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        </Link>
 
         {/* Badges Overlay */}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start pointer-events-none">
@@ -45,8 +46,9 @@ export const PackagedProductCard = ({
         <button
           type="button"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            onToggleWishlist(product);
+            if (onToggleWishlist) onToggleWishlist(product);
           }}
           className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition shadow-xs active:scale-90 cursor-pointer ${
             isWishlisted
@@ -58,11 +60,27 @@ export const PackagedProductCard = ({
           <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current text-rose-500' : ''}`} />
         </button>
 
-        {/* Quick View Button on Hover */}
-        <div className="absolute bottom-2 inset-x-2 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center pointer-events-none">
-          <span className="px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm">
-            <Eye className="w-3 h-3" /> Quick Details
-          </span>
+        {/* Quick View Modal & Product Page Trigger */}
+        <div className="absolute bottom-2 inset-x-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-wrap justify-center gap-1.5">
+          {onOpenDetails && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenDetails(product);
+              }}
+              className="px-2.5 py-1 bg-black/70 hover:bg-black text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm cursor-pointer"
+            >
+              <Eye className="w-3 h-3" /> Quick View
+            </button>
+          )}
+          <Link
+            to={`/product/${product.id}`}
+            className="px-2.5 py-1 bg-[#1B4332]/90 hover:bg-[#1B4332] text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm"
+          >
+            <ExternalLink className="w-3 h-3" /> Product Page
+          </Link>
         </div>
       </div>
 
@@ -77,28 +95,40 @@ export const PackagedProductCard = ({
             <span className="text-gray-400 flex-shrink-0">{product.weight}</span>
           </div>
 
-          {/* Product Name */}
-          <h4
-            onClick={() => onOpenDetails(product)}
-            className="font-bold text-gray-900 text-xs sm:text-sm leading-snug line-clamp-2 mt-1 cursor-pointer hover:text-[#1B4332] transition-colors"
+          {/* Product Name -> Links to Product Page */}
+          <Link
+            to={`/product/${product.id}`}
+            className="font-bold text-gray-900 text-xs sm:text-sm leading-snug line-clamp-2 mt-1 hover:text-[#1B4332] transition-colors block"
           >
             {product.name}
-          </h4>
+          </Link>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs">
-            <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 text-amber-900 font-black text-[10px]">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
-              <span>{product.rating}</span>
+          {/* Rating & Product Page link */}
+          <div className="flex items-center justify-between gap-1.5 mt-1.5 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 text-amber-900 font-black text-[10px]">
+                <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+                <span>{product.rating}</span>
+              </div>
+              <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
             </div>
-            <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
+
+            {onOpenDetails && (
+              <button
+                type="button"
+                onClick={() => onOpenDetails(product)}
+                className="text-[10px] font-bold text-emerald-800 hover:underline cursor-pointer sm:hidden"
+              >
+                Info
+              </button>
+            )}
           </div>
         </div>
 
-        {/* 3. Pricing and Add/Quantity Control (Swiggy Instamart style) */}
-        <div className="pt-3 mt-2 border-t border-gray-100 flex items-center justify-between gap-2">
-          <div>
-            <div className="flex items-baseline gap-1.5">
+        {/* 3. Pricing and Add/Quantity Control (Stacks cleanly below price on narrow mobile cards, inline on sm+) */}
+        <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center justify-between sm:block gap-2 min-w-0">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
               <span className="text-base sm:text-lg font-black text-gray-900">
                 ₹{product.price}
               </span>
@@ -108,17 +138,20 @@ export const PackagedProductCard = ({
                 </span>
               )}
             </div>
-            <span className="text-[9px] text-emerald-700 font-bold block">10 mins away</span>
+            <span className="text-[9px] text-emerald-700 font-bold block flex-shrink-0">10 mins away</span>
           </div>
 
-          {/* Swiggy Instamart Interactive Add Button / Quantity Counter */}
-          <div className="flex-shrink-0">
+          {/* Interactive Add Button / Quantity Counter */}
+          <div className="w-full sm:w-auto flex-shrink-0">
             {quantity > 0 ? (
-              <div className="flex items-center bg-[#1B4332] text-white rounded-xl shadow-xs overflow-hidden border border-[#1B4332]">
+              <div className="flex items-center justify-between sm:justify-center w-full sm:w-auto bg-[#1B4332] text-white rounded-xl shadow-xs overflow-hidden border border-[#1B4332]">
                 <button
                   type="button"
-                  onClick={() => onUpdateQuantity(product, quantity - 1)}
-                  className="px-2.5 py-1.5 hover:bg-[#2D6A4F] transition active:scale-95 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onUpdateQuantity) onUpdateQuantity(product, quantity - 1);
+                  }}
+                  className="px-3 sm:px-2 py-1.5 hover:bg-[#2D6A4F] transition active:scale-95 cursor-pointer"
                   aria-label="Decrease quantity"
                 >
                   <Minus className="w-3.5 h-3.5" />
@@ -128,8 +161,11 @@ export const PackagedProductCard = ({
                 </span>
                 <button
                   type="button"
-                  onClick={() => onUpdateQuantity(product, quantity + 1)}
-                  className="px-2.5 py-1.5 hover:bg-[#2D6A4F] transition active:scale-95 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onUpdateQuantity) onUpdateQuantity(product, quantity + 1);
+                  }}
+                  className="px-3 sm:px-2 py-1.5 hover:bg-[#2D6A4F] transition active:scale-95 cursor-pointer"
                   aria-label="Increase quantity"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -138,8 +174,11 @@ export const PackagedProductCard = ({
             ) : (
               <button
                 type="button"
-                onClick={() => onAddToCart(product)}
-                className="px-3.5 sm:px-4 py-1.5 bg-white hover:bg-emerald-50 text-[#1B4332] font-black text-xs rounded-xl border-2 border-[#1B4332] shadow-xs hover:shadow transition active:scale-95 flex items-center gap-1 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onAddToCart) onAddToCart(product);
+                }}
+                className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-1.5 bg-white hover:bg-emerald-50 text-[#1B4332] font-black text-xs rounded-xl border-2 border-[#1B4332] shadow-xs hover:shadow transition active:scale-95 flex items-center gap-1 cursor-pointer"
               >
                 <span>ADD</span>
                 <Plus className="w-3 h-3 text-[#1B4332] stroke-[3]" />
@@ -151,4 +190,3 @@ export const PackagedProductCard = ({
     </div>
   );
 };
-

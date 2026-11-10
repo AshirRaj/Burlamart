@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Sparkles
 } from 'lucide-react';
+import { HotelBookingVoucher } from '../../components/hotels/HotelBookingVoucher';
 
 export const OrderTracking = () => {
   const { orderId } = useParams();
@@ -31,6 +32,13 @@ export const OrderTracking = () => {
 
   useEffect(() => {
     fetchOrder();
+    const handleSync = () => fetchOrder();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('burlamart_db_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('burlamart_db_updated', handleSync);
+    };
   }, [orderId]);
 
   // Status progression simulation for interactive testing
@@ -116,6 +124,9 @@ export const OrderTracking = () => {
         </div>
       )}
 
+      {/* Hotel Stay Voucher if applicable */}
+      <HotelBookingVoucher order={order} />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: 6-Stage Timeline (Page 6) */}
         <div className="lg:col-span-2 space-y-6">
@@ -128,6 +139,15 @@ export const OrderTracking = () => {
                 <h2 className="text-xl font-extrabold text-gray-900 mt-1">
                   Estimated Delivery: 12-15 Mins
                 </h2>
+                {order.deliveryPin && (
+                  <div className="mt-2 inline-flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl text-xs">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+                    <span className="text-amber-900 font-semibold">Handover Delivery PIN:</span>
+                    <span className="font-mono font-black text-amber-950 tracking-widest bg-white px-2 py-0.5 rounded border border-amber-200">
+                      {order.deliveryPin}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Status Simulator Tools for Evaluator */}

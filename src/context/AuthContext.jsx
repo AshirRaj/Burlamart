@@ -8,8 +8,8 @@ export const DEMO_PROFILES = {
     role: 'customer',
     name: 'Aarav Patel',
     phone: '9876543210',
-    email: 'aarav.patel@example.com',
-    address: 'Flat 402, Sunshine Heights, Civil Lines, Jaipur (Pin 302006)',
+    email: 'aarav.patel@burlamart.in',
+    address: 'Hall-4, VSSUT Campus, Burla, Sambalpur (Pin 768018)',
     roleTitle: 'Customer / Consumer',
     isMembershipActive: true,
   },
@@ -18,10 +18,10 @@ export const DEMO_PROFILES = {
     role: 'vendor',
     name: 'Ramesh Sharma',
     phone: '9822233445',
-    email: 'ramesh@freshmandijaipur.com',
-    address: 'Shop 14, Central Market, Jaipur (Pin 302001)',
+    email: 'ramesh@burlamartburla.com',
+    address: 'VSSUT Road, Main Market, Burla, Sambalpur (Pin 768018)',
     activeVendorId: 'shop-1',
-    shopName: 'Fresh Mandi & Organic Grocery',
+    shopName: 'Burlamart Fresh Supermart',
     roleTitle: 'Vendor (Merchant Partner)',
   },
   rider: {
@@ -30,7 +30,7 @@ export const DEMO_PROFILES = {
     name: 'Deepak Kumar',
     phone: '9811122334',
     email: 'deepak.rider@burlamart.com',
-    vehicle: 'Hero Splendor Plus (DL 04 AB 4321)',
+    vehicle: 'Hero Splendor Plus (OD 15 AB 4321)',
     activeRiderId: 'rider-1',
     roleTitle: 'Delivery Partner (Rider)',
   },
@@ -73,6 +73,16 @@ export const AuthProvider = ({ children }) => {
     setCurrentRole(role);
     setCurrentUser(profile);
     setIsAuthenticated(true);
+  };
+
+  const switchVendorShop = (shopObj) => {
+    if (!shopObj) return;
+    setCurrentUser(prev => ({
+      ...prev,
+      activeVendorId: shopObj.id,
+      shopName: shopObj.name,
+      activeVendorCategory: shopObj.category
+    }));
   };
 
   const requestOtp = async (phone) => {
@@ -140,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       currentRole,
       switchRole,
+      switchVendorShop,
       currentUser,
       setCurrentUser,
       isAuthenticated,

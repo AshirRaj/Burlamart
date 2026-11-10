@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { 
   TrendingUp, 
   ShoppingBag, 
@@ -16,20 +17,40 @@ import {
 } from 'lucide-react';
 
 export const VendorDashboard = () => {
+  const outletCtx = useOutletContext() || {};
+  const { currentUser } = useAuth();
+  const activeShopId = outletCtx.activeShopId || currentUser?.activeVendorId || 'shop-1';
+
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [shop, setShop] = useState(null);
+
+  const fetchData = async () => {
+    const [allOrders, allProds, shopInfo] = await Promise.all([
+      api.orders.getAll({ shopId: activeShopId }),
+      api.products.getAll({ shopId: activeShopId }),
+      api.shops.getById(activeShopId)
+    ]);
+    setOrders(allOrders);
+    setProducts(allProds);
+    setShop(shopInfo);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const allOrders = await api.orders.getAll({ shopId: 'shop-1' });
-      setOrders(allOrders);
-      const allProds = await api.products.getAll({ shopId: 'shop-1' });
-      setProducts(allProds);
-    };
     fetchData();
-  }, []);
+    const handleSync = () => fetchData();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('burlamart_db_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('burlamart_db_updated', handleSync);
+    };
+  }, [activeShopId]);
 
-  const lowStockItems = products.filter(p => p.stock <= 10 || p.limitedStock);
+  const lowStockItems = products.filter(p => (p.stock ?? 20) <= 10 || p.limitedStock);
+  const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+  const pendingOrdersCount = orders.filter(o => o.status === 'Order Placed').length;
+  const deliveredOrdersCount = orders.filter(o => o.status === 'Delivered').length;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -37,14 +58,14 @@ export const VendorDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs">
           <div className="flex items-center justify-between text-gray-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Today's Sales</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Store Revenue</span>
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-gray-900">₹14,890</div>
+          <div className="text-2xl font-extrabold text-gray-900">₹{totalRevenue.toLocaleString('en-IN')}</div>
           <div className="text-[11px] text-emerald-700 font-bold mt-1 flex items-center gap-1">
-            <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% from yesterday
+            <ArrowUpRight className="w-3.5 h-3.5" /> {deliveredOrdersCount} settled deliveries
           </div>
         </div>
 
@@ -57,7 +78,7 @@ export const VendorDashboard = () => {
           </div>
           <div className="text-2xl font-extrabold text-gray-900">{orders.length} Orders</div>
           <div className="text-[11px] text-blue-700 font-semibold mt-1">
-            2 pending dispatch confirmation
+            {pendingOrdersCount} pending dispatch confirmation
           </div>
         </div>
 
@@ -76,14 +97,14 @@ export const VendorDashboard = () => {
 
         <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs">
           <div className="flex items-center justify-between text-gray-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Customer Views</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Partner Reputation</span>
             <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-gray-900">1,420 Views</div>
+          <div className="text-2xl font-extrabold text-gray-900">{shop?.rating || 4.8} ★</div>
           <div className="text-[11px] text-purple-700 font-semibold mt-1">
-            4.8 ★ store average rating
+            {shop?.reviewsCount || 0} verified customer reviews
           </div>
         </div>
       </div>

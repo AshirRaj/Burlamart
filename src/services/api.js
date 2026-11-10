@@ -29,6 +29,7 @@ import {
 } from './mockData';
 import { ALL_GROCERY_PRODUCTS } from '../components/grocery/groceryData';
 import { ALL_ELECTRONICS_PRODUCTS } from '../components/electronics/electronicsData';
+import { PACKAGED_PRODUCTS } from '../data/packagedFoodData';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 const USE_MOCK = import.meta.env.VITE_ENABLE_MOCK_DATA !== 'false';
@@ -66,6 +67,7 @@ const getStoredState = (key, initial) => {
 const setStoredState = (key, data) => {
   try {
     localStorage.setItem(`burlamart_${key}`, JSON.stringify(data));
+    window.dispatchEvent(new CustomEvent('burlamart_db_updated', { detail: { key } }));
   } catch (e) {
     console.error('Failed to save to localStorage', e);
   }
@@ -146,6 +148,11 @@ export const api = {
         const existingIds = new Set(list.map(p => p.id));
         const missingElec = ALL_ELECTRONICS_PRODUCTS.filter(p => !existingIds.has(p.id));
         list = [...list, ...missingElec];
+        const afterElecIds = new Set(list.map(p => p.id));
+        const missingPackaged = PACKAGED_PRODUCTS
+          .filter(p => !afterElecIds.has(p.id))
+          .map(p => ({ ...p, category: 'packaged-food', subCategory: p.category, shopId: p.shopId || 'shop-5' }));
+        list = [...list, ...missingPackaged];
 
         if (filter.category) list = list.filter(p => p.category === filter.category);
         if (filter.shopId) list = list.filter(p => p.shopId === filter.shopId);
@@ -172,7 +179,16 @@ export const api = {
         const catalogFound = ALL_GROCERY_PRODUCTS.find(p => p.id === productId);
         if (catalogFound) return { ...catalogFound, shopId: 'shop-1' };
         const elecFound = ALL_ELECTRONICS_PRODUCTS.find(p => p.id === productId);
-        if (elecFound) return { ...elecFound, shopId: 'shop-2' };
+        if (elecFound) return { ...elecFound, shopId: 'shop-4' };
+        const packagedFound = PACKAGED_PRODUCTS.find(p => p.id === productId);
+        if (packagedFound) {
+          return {
+            ...packagedFound,
+            category: 'packaged-food',
+            subCategory: packagedFound.category,
+            shopId: packagedFound.shopId || 'shop-5'
+          };
+        }
         return null;
       }
       const res = await fetch(`${BASE_URL}/products/${productId}`);
@@ -261,10 +277,12 @@ export const api = {
     create: async (orderPayload) => {
       if (USE_MOCK) {
         const list = getStoredState('orders', INITIAL_ORDERS);
+        const generatedPin = String(Math.floor(1000 + Math.random() * 9000));
         const newOrder = {
           ...orderPayload,
           id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
           status: 'Order Placed',
+          deliveryPin: orderPayload.deliveryPin || generatedPin,
           createdAt: new Date().toISOString(),
           timeline: [
             { status: 'Order Placed', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), done: true },
@@ -277,6 +295,21 @@ export const api = {
         };
         const updated = [newOrder, ...list];
         setStoredState('orders', updated);
+
+        // Auto-decrement product stock in catalogue for purchased items
+        if (Array.isArray(orderPayload.items) && orderPayload.items.length > 0) {
+          const prods = getStoredState('products', INITIAL_PRODUCTS);
+          const qtyMap = new Map(orderPayload.items.map(i => [i.id, i.quantity || 1]));
+          const updatedProds = prods.map(p => {
+            if (qtyMap.has(p.id) && typeof p.stock === 'number') {
+              const nextStock = Math.max(0, p.stock - qtyMap.get(p.id));
+              return { ...p, stock: nextStock, limitedStock: nextStock > 0 && nextStock <= 5 };
+            }
+            return p;
+          });
+          setStoredState('products', updatedProds);
+        }
+
         return newOrder;
       }
       const res = await fetch(`${BASE_URL}/orders`, {
@@ -286,19 +319,19 @@ export const api = {
       });
       return res.json();
     },
-    updateStatus: async (orderId, newStatus, riderNote = '') => {
+    updateStatus: async (orderId, newStatus, riderNote = '', extraFields = {}) => {
       if (USE_MOCK) {
         const list = getStoredState('orders', INITIAL_ORDERS);
         const updated = list.map(ord => {
           if (ord.id === orderId) {
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const timeline = ord.timeline.map(t => {
+            const timeline = (ord.timeline || []).map(t => {
               if (t.status.toLowerCase().includes(newStatus.toLowerCase())) {
                 return { ...t, done: true, time: timeStr, note: riderNote || t.note };
               }
               return t;
             });
-            return { ...ord, status: newStatus, timeline };
+            return { ...ord, ...extraFields, status: newStatus, timeline };
           }
           return ord;
         });

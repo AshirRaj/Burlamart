@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
   });
 
   const [deliveryType, setDeliveryType] = useState('delivery'); // 'delivery' or 'pickup'
-  const [address, setAddress] = useState('Flat 402, Sunshine Heights, Civil Lines, Jaipur (Pin 302006)');
+  const [address, setAddress] = useState('Hall-4, VSSUT Campus, Burla, Sambalpur (Pin 768018)');
   const [distanceKm, setDistanceKm] = useState(2.4);
   const [useFastDelivery, setUseFastDelivery] = useState(false);
   const [includePackaging, setIncludePackaging] = useState(true);
