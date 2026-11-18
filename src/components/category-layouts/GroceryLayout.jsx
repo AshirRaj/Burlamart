@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { 
   GroceryHeroBanner, 
+  GroceryPromotionalBanner,
   GrocerySubcategoryGrid, 
   GrocerySectionRow, 
   GROCERY_CATALOG_SECTIONS 
@@ -66,6 +67,9 @@ export const GroceryLayout = ({ products = [], shop, categoryName }) => {
         selectedSubcat={selectedSubcat}
         onSelectSubcategory={handleSelectSubcategory}
       />
+
+      {/* Farm-Fresh Organic Harvest Promotional Banner */}
+      <GroceryPromotionalBanner onShopProduce={handleScrollToCatalogue} />
 
       {/* 3. Categorized Product Carousels */}
       <div className="space-y-8">

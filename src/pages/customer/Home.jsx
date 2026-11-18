@@ -26,6 +26,7 @@ import {
 import { HomeVideoHero } from '../../components/home/HomeVideoHero';
 import { HomeCategorySlider } from '../../components/home/HomeCategorySlider';
 import { HomeCategoryProductsRow } from '../../components/home/HomeCategoryProductsRow';
+import { HomeHyperlocalBanner } from '../../components/home/HomeHyperlocalBanner';
 import { HomeWhyChooseUs } from '../../components/home/HomeWhyChooseUs';
 import { ALL_GROCERY_PRODUCTS } from '../../components/grocery/groceryData';
 import { ALL_ELECTRONICS_PRODUCTS } from '../../components/electronics/electronicsData';
@@ -223,7 +224,10 @@ export const Home = () => {
         </div>
       </div>
 
-      {/* 5. HOW IT WORKS, WHY CHOOSE US, ABOUT BURLAMART & TESTIMONIALS */}
+      {/* 5. HYPERLOCAL CAMPUS & ODISHA PRIVILEGE BANNER */}
+      <HomeHyperlocalBanner />
+
+      {/* 6. HOW IT WORKS, WHY CHOOSE US, ABOUT BURLAMART & TESTIMONIALS */}
       <HomeWhyChooseUs />
 
       {/* 6. NEARBY VERIFIED NEIGHBORHOOD SHOPS & STOREFRONTS */}

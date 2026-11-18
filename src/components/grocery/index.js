@@ -1,4 +1,5 @@
 export { GroceryHeroBanner } from './GroceryHeroBanner';
+export { GroceryPromotionalBanner } from './GroceryPromotionalBanner';
 export { GrocerySubcategoryGrid } from './GrocerySubcategoryGrid';
 export { GroceryProductCard } from './GroceryProductCard';
 export { GrocerySectionRow } from './GrocerySectionRow';

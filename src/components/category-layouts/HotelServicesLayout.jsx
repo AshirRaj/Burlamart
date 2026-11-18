@@ -4,6 +4,7 @@ import {
   HotelHeroVideoBanner,
   HotelFloatingSearchBar,
   HotelAmenitiesSection,
+  HotelPromotionalBanner,
   HotelDiscoverIndiaGrid,
   HotelVideoToursSection,
   HotelWizardMembership,
@@ -260,6 +261,11 @@ export const HotelServicesLayout = ({ products = [], shop, categoryName }) => {
 
       {/* 2. Burlamart-Serviced Hotels & 5 3D Amenity Cards (Image 2) */}
       <HotelAmenitiesSection />
+
+      {/* Odisha Heritage & Tourist Stay Promotional Banner */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <HotelPromotionalBanner onSearchClick={() => window.scrollTo({ top: 150, behavior: 'smooth' })} />
+      </div>
 
       {/* 3. Discover India with Burlamart - Tabs & Bento Grid (Images 4 & 5) */}
       <HotelDiscoverIndiaGrid onSelectCity={handleSelectCity} />

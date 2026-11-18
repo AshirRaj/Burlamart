@@ -1,6 +1,7 @@
 export * from './electronicsData';
 export * from './AmazonSubNav';
 export * from './AmazonHeroCarousel';
+export * from './AmazonFestivalBannerStrip';
 export * from './AmazonProductTile';
 export * from './AmazonPricePointTile';
 export * from './AmazonCategoryTile';

@@ -1,12 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { INITIAL_PLATFORM_SETTINGS, INITIAL_CATEGORIES } from '../services/mockData';
+import { INITIAL_PROMOTIONAL_BANNERS } from '../data/bannerData';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [platformSettings, setPlatformSettings] = useState(INITIAL_PLATFORM_SETTINGS);
+  const [promotionalBanners, setPromotionalBanners] = useState(() => {
+    try {
+      const saved = localStorage.getItem('burlamart_promotional_banners');
+      return saved ? JSON.parse(saved) : INITIAL_PROMOTIONAL_BANNERS;
+    } catch {
+      return INITIAL_PROMOTIONAL_BANNERS;
+    }
+  });
   const [sharedWalletBalance, setSharedWalletBalance] = useState(140); // Customer reward points
   const [vendorCoinBalance, setVendorCoinBalance] = useState(250); // Vendor coin balance for templates/boosts
   const [language, setLanguage] = useState('English');
@@ -86,6 +95,37 @@ export const AppProvider = ({ children }) => {
     setVendorCoinBalance(prev => prev + amount);
   };
 
+  // Banner Management Operations (Admin)
+  const updateBanner = (bannerId, updatedFields) => {
+    setPromotionalBanners(prev => {
+      const current = prev[bannerId] || {};
+      const next = {
+        ...prev,
+        [bannerId]: { ...current, ...updatedFields }
+      };
+      localStorage.setItem('burlamart_promotional_banners', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const toggleBannerActive = (bannerId) => {
+    setPromotionalBanners(prev => {
+      const current = prev[bannerId];
+      if (!current) return prev;
+      const next = {
+        ...prev,
+        [bannerId]: { ...current, isActive: !current.isActive }
+      };
+      localStorage.setItem('burlamart_promotional_banners', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const resetBanners = () => {
+    setPromotionalBanners(INITIAL_PROMOTIONAL_BANNERS);
+    localStorage.setItem('burlamart_promotional_banners', JSON.stringify(INITIAL_PROMOTIONAL_BANNERS));
+  };
+
   return (
     <AppContext.Provider value={{
       categories,
@@ -93,6 +133,10 @@ export const AppProvider = ({ children }) => {
       updateCategoryTemplate,
       platformSettings,
       updateSettings,
+      promotionalBanners,
+      updateBanner,
+      toggleBannerActive,
+      resetBanners,
       sharedWalletBalance,
       creditSharedWallet,
       debitSharedWallet,

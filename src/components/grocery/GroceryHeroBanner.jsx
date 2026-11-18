@@ -6,23 +6,24 @@ export const GroceryHeroBanner = ({ onShopNow }) => {
   return (
     <div className="space-y-4">
       {/* 1. Main Hero Banner: Stock up on daily essentials */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#1B4332] via-[#2D6A4F] to-[#40916C] text-white shadow-xl min-h-[220px] sm:min-h-[260px] flex items-center">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#1B4332] via-[#2D6A4F] to-[#40916C] text-white shadow-xl min-h-[160px] sm:min-h-[260px] flex items-center">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
-        <div className="relative z-10 p-6 sm:p-10 max-w-xl space-y-3">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+        <div className="relative z-10 p-5 sm:p-10 max-w-xl space-y-2 sm:space-y-3">
+          <h1 className="text-xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
             Stock up on daily essentials
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100 font-medium max-w-md leading-relaxed">
+          <p className="text-xs sm:text-sm text-emerald-100 font-medium max-w-md leading-relaxed line-clamp-1 sm:line-clamp-none">
             Get farm-fresh goodness & a range of exotic fruits, vegetables, eggs & more
           </p>
-          <div className="pt-2">
+          <div className="pt-1 sm:pt-2">
             <button
               type="button"
               onClick={onShopNow}
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-900 font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-lg transition active:scale-95"
+              className="inline-flex items-center gap-1.5 sm:gap-2 bg-white hover:bg-gray-100 text-gray-900 font-extrabold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl shadow-lg transition active:scale-95 cursor-pointer"
             >
               <span>Shop Now</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-800" />
             </button>
           </div>
         </div>

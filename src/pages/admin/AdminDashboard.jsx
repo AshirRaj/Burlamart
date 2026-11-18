@@ -105,7 +105,26 @@ export const AdminDashboard = () => {
       />
 
       {/* Quick Action Portals */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <Link
+          to="/admin/banners"
+          className="bg-white p-6 rounded-3xl border border-gray-200 hover:border-purple-400 shadow-xs hover:shadow-md transition space-y-3 block group"
+        >
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <h3 className="font-extrabold text-base text-gray-900 group-hover:text-purple-800 transition">
+            Promotional Banner Manager
+          </h3>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Update real banner photography, headlines, coupon codes, and action links for Home, Grocery, Hotels, and Electronics.
+          </p>
+          <div className="text-xs font-bold text-purple-700 flex items-center gap-1">
+            <span>Manage Banners</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </Link>
+
         <Link
           to="/admin/templates"
           className="bg-white p-6 rounded-3xl border border-gray-200 hover:border-purple-400 shadow-xs hover:shadow-md transition space-y-3 block group"

@@ -35,7 +35,7 @@ export const PackagedFoodHero = ({ onExploreClick, onViewBestsellersClick }) => 
   };
 
   return (
-    <section className="relative w-full rounded-3xl overflow-hidden bg-[#1B4332] text-white shadow-xl min-h-[440px] sm:min-h-[500px] flex items-center border border-[#2D6A4F]/40">
+    <section className="relative w-full rounded-3xl overflow-hidden bg-[#1B4332] text-white shadow-xl min-h-[300px] sm:min-h-[500px] flex items-center border border-[#2D6A4F]/40">
       {/* 1. Cinematic Background Food Media with warm wooden lighting */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <video
@@ -57,68 +57,68 @@ export const PackagedFoodHero = ({ onExploreClick, onViewBestsellersClick }) => 
       </div>
 
       {/* Floating Audio/Video controls */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
           onClick={togglePlay}
-          className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition"
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition"
           title={isPlaying ? 'Pause' : 'Play'}
         >
-          {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+          {isPlaying ? <Pause className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-0.5" />}
         </button>
         <button
           type="button"
           onClick={toggleMute}
-          className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition"
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition"
           title={isMuted ? 'Unmute' : 'Mute'}
         >
-          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          {isMuted ? <VolumeX className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
         </button>
       </div>
 
       {/* 2. Content Left-Aligned with Positive Negative Space for Food Imagery */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-10 py-10 sm:py-14 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <div className="lg:col-span-8 space-y-4 sm:space-y-5">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-10 py-6 sm:py-14 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+        <div className="lg:col-span-8 space-y-3 sm:space-y-5">
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-200 text-xs font-bold tracking-wider uppercase">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-200 text-[10px] sm:text-xs font-bold tracking-wider uppercase">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
             <span>BURLAMART • PACKAGED FOOD</span>
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-none">
+          <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-none">
             Your Favourite Snacks, <br className="hidden sm:inline" />
             <span className="text-amber-300">Delivered Fresh</span>
           </h1>
 
-          {/* Supporting Text */}
-          <p className="text-sm sm:text-base text-emerald-100/90 max-w-xl font-normal leading-relaxed">
+          {/* Supporting Text - hidden on mobile to avoid overcrowding; preserved 100% on desktop */}
+          <p className="hidden sm:block text-sm sm:text-base text-emerald-100/90 max-w-xl font-normal leading-relaxed">
             Discover delicious snacks, everyday favourites, and treats for every craving. Handcrafted namkeen, artisanal cookies, instant noodles, and party munchies delivered to your doorstep in 10 minutes.
           </p>
 
           {/* CTA Buttons */}
-          <div className="pt-2 flex flex-wrap items-center gap-3.5">
+          <div className="pt-1 sm:pt-2 flex items-center gap-2.5 sm:gap-3.5">
             <button
               type="button"
               onClick={onExploreClick}
-              className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-gray-950 font-black text-sm rounded-2xl shadow-lg hover:shadow-amber-500/30 transition flex items-center gap-2 active:scale-95 cursor-pointer"
+              className="px-4 py-2 sm:px-6 sm:py-3 bg-amber-400 hover:bg-amber-500 text-gray-950 font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg hover:shadow-amber-500/30 transition flex items-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer"
             >
               <span>Explore Snacks</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
             <button
               type="button"
               onClick={onViewBestsellersClick}
-              className="px-5 py-3 bg-white/15 hover:bg-white/25 text-white font-bold text-sm rounded-2xl border border-white/25 backdrop-blur-md transition flex items-center gap-2 active:scale-95 cursor-pointer"
+              className="px-3.5 py-2 sm:px-5 sm:py-3 bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl border border-white/25 backdrop-blur-md transition flex items-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer"
             >
-              <Flame className="w-4 h-4 text-amber-300" />
-              <span>View Bestsellers</span>
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
+              <span>Bestsellers</span>
             </button>
           </div>
 
-          {/* Trust Footnotes */}
-          <div className="pt-3 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-emerald-200/80 font-medium border-t border-white/10">
+          {/* Trust Footnotes - hidden on mobile for clean breathing room, visible on desktop */}
+          <div className="hidden sm:flex pt-3 flex-wrap items-center gap-4 sm:gap-6 text-xs text-emerald-200/80 font-medium border-t border-white/10">
             <div className="flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-amber-300" />
               <span>10-Min Delivery in Burla & Sambalpur</span>

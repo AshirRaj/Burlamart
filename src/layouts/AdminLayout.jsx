@@ -25,6 +25,7 @@ export const AdminLayout = () => {
   const navItems = [
     { path: '/admin', label: 'Overview', icon: ShieldCheck, exact: true },
     { path: '/admin/templates', label: 'Category UI Templates', icon: Layers, highlight: true },
+    { path: '/admin/banners', label: 'Promotional Banners', icon: Sparkles, highlight: true },
     { path: '/admin/vendors', label: 'Vendor Management & Rent', icon: Store },
     { path: '/admin/master-templates', label: 'Master Product Templates', icon: Package },
     { path: '/admin/settings', label: 'Settings & Distance Slabs', icon: Settings },

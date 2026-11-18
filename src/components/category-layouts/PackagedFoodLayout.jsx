@@ -10,6 +10,7 @@ import {
 import { PackagedFoodHero } from '../packaged-food/PackagedFoodHero';
 import { FoodOptionsCarousel } from '../packaged-food/FoodOptionsCarousel';
 import { PackagedPromotions } from '../packaged-food/PackagedPromotions';
+import { PackagedCravingsBanner } from '../packaged-food/PackagedCravingsBanner';
 import { PackagedCategoryNav } from '../packaged-food/PackagedCategoryNav';
 import { PackagedFilterBar } from '../packaged-food/PackagedFilterBar';
 import { PackagedProductCard } from '../packaged-food/PackagedProductCard';
@@ -329,6 +330,18 @@ export const PackagedFoodLayout = ({ products: initialProducts, shop, categoryNa
             }}
           />
         </section>
+
+        {/* Late Night Cravings & Weekend Party Binge Banner */}
+        <PackagedCravingsBanner
+          onExploreCombos={() => {
+            const el = document.getElementById('family-combos-section');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              handleScrollToSection('snacks-product-catalog');
+            }
+          }}
+        />
 
         {/* 4. CATEGORY HORIZONTAL NAVIGATION (10 CATEGORIES) */}
         <section>

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { 
   AmazonSubNav,
   AmazonHeroCarousel,
+  AmazonFestivalBannerStrip,
   AmazonDealPod,
   AmazonGamificationPod,
   AmazonDealsListingPage,
@@ -79,6 +80,9 @@ export const ElectronicsLayout = ({ products = [], shop, categoryName }) => {
             <AmazonDealPod key={pod.id} pod={pod} onSelectPod={handleOpenDealsPage} />
           ))}
         </section>
+
+        {/* Great Indian Festival Carnival Banner Strip */}
+        <AmazonFestivalBannerStrip onExploreDeals={() => handleOpenDealsPage('Great Indian Festival - Top 10 Diwali Deals')} />
 
         {/* ROW 3 (Reference Image 4): Upgrade style, Emerging brands, Business under ₹999, Footwear & handbags */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -3,6 +3,7 @@ export * from './HotelGuestRoomModal';
 export * from './HotelFloatingSearchBar';
 export * from './HotelHeroVideoBanner';
 export * from './HotelAmenitiesSection';
+export * from './HotelPromotionalBanner';
 export * from './HotelDiscoverIndiaGrid';
 export * from './HotelVideoToursSection';
 export * from './HotelWizardMembership';

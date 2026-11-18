@@ -54,6 +54,7 @@ const VendorManagement = lazyNamed(() => import('./pages/admin/VendorManagement'
 const MasterProductTemplates = lazyNamed(() => import('./pages/admin/MasterProductTemplates'), 'MasterProductTemplates');
 const PlatformSettings = lazyNamed(() => import('./pages/admin/PlatformSettings'), 'PlatformSettings');
 const MonetisationSettings = lazyNamed(() => import('./pages/admin/MonetisationSettings'), 'MonetisationSettings');
+const AdminBannerManager = lazyNamed(() => import('./pages/admin/AdminBannerManager'), 'AdminBannerManager');
 
 const RouteFallback = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-gray-500">
@@ -137,6 +138,7 @@ export default function App() {
                   <Route path="templates" element={<CategoryTemplateManager />} />
                   <Route path="vendors" element={<VendorManagement />} />
                   <Route path="master-templates" element={<MasterProductTemplates />} />
+                  <Route path="banners" element={<AdminBannerManager />} />
                   <Route path="settings" element={<PlatformSettings />} />
                   <Route path="monetisation" element={<MonetisationSettings />} />
                 </Route>

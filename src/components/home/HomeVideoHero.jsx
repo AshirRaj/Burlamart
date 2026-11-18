@@ -176,7 +176,7 @@ export const HomeVideoHero = () => {
   ];
 
   return (
-    <div className="relative w-full min-h-[580px] lg:min-h-[640px] rounded-3xl overflow-hidden shadow-2xl bg-[#0f172a] text-white border border-slate-700/80 flex flex-col justify-between">
+    <div className="relative w-full min-h-[420px] sm:min-h-[580px] lg:min-h-[640px] rounded-3xl overflow-hidden shadow-2xl bg-[#0f172a] text-white border border-slate-700/80 flex flex-col justify-between">
       {/* 1. RELATABLE PROJECT BACKGROUND LAYER (Real Supermarket Video / Hotel Suite / Tech Store - NO FOREST!) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {currentMode.videoSrc ? (
@@ -209,122 +209,124 @@ export const HomeVideoHero = () => {
 
       {/* Floating Media Controls (Play/Pause & Sound) */}
       {currentMode.videoSrc && (
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={togglePlay}
-            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition cursor-pointer"
             title={isPlaying ? 'Pause Supermarket Video' : 'Play Supermarket Video'}
           >
-            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+            {isPlaying ? <Pause className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-0.5" />}
           </button>
           <button
             type="button"
             onClick={toggleMute}
-            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition cursor-pointer"
             title={isMuted ? 'Unmute Sound' : 'Mute Sound'}
           >
-            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+            {isMuted ? <VolumeX className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
           </button>
         </div>
       )}
 
-      {/* 2. Category Switcher Tabs - Instant Relatable Mode Switch */}
-      <div className="relative z-10 pt-5 px-4 sm:px-8 max-w-6xl mx-auto w-full">
-        <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-3">
+      {/* 2. Category Switcher Tabs - Sleek Scroll Strip on Mobile, Centered on Desktop */}
+      <div className="relative z-10 pt-3 sm:pt-5 px-3 sm:px-8 max-w-6xl mx-auto w-full">
+        <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto no-scrollbar py-1 w-full justify-start sm:justify-center px-1">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border ${activeTab === 'all'
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border flex-shrink-0 ${activeTab === 'all'
                 ? 'bg-white text-gray-950 border-white shadow-lg scale-105'
                 : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
             <span>All Categories</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('grocery')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border ${activeTab === 'grocery'
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border flex-shrink-0 ${activeTab === 'grocery'
                 ? 'bg-emerald-500 text-gray-950 border-emerald-400 shadow-lg scale-105'
                 : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-emerald-300" />
-            <span>Supermarket Video (10 Mins)</span>
+            <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-300" />
+            <span className="hidden sm:inline">Supermarket Video (10 Mins)</span>
+            <span className="sm:hidden">Groceries (10 Mins)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('hotels-services')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border ${activeTab === 'hotels-services'
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border flex-shrink-0 ${activeTab === 'hotels-services'
                 ? 'bg-teal-400 text-gray-950 border-teal-300 shadow-lg scale-105'
                 : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               }`}
           >
-            <Hotel className="w-3.5 h-3.5 text-teal-200" />
+            <Hotel className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-200" />
             <span>OYO Hotel Rooms</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('electronics')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border ${activeTab === 'electronics'
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border flex-shrink-0 ${activeTab === 'electronics'
                 ? 'bg-amber-400 text-gray-950 border-amber-300 shadow-lg scale-105'
                 : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               }`}
           >
-            <Smartphone className="w-3.5 h-3.5 text-amber-200" />
+            <Smartphone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-200" />
             <span>Electronics & EMI</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('packaged-food')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border ${activeTab === 'packaged-food'
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md border flex-shrink-0 ${activeTab === 'packaged-food'
                 ? 'bg-orange-400 text-gray-950 border-orange-300 shadow-lg scale-105'
                 : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               }`}
           >
-            <Cookie className="w-3.5 h-3.5 text-orange-200" />
+            <Cookie className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-200" />
             <span>Packaged Combos</span>
           </button>
         </div>
       </div>
 
-      {/* 3. Hero Center Content: Dynamic Headline & Interactive Search */}
-      <div className="relative z-10 px-5 sm:px-10 py-6 sm:py-8 max-w-5xl mx-auto flex flex-col items-center text-center space-y-4 my-auto">
-        <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm transition-all animate-in fade-in duration-300 ${currentMode.badgeColor}`}>
-          <Zap className="w-3.5 h-3.5" />
-          {currentMode.tag}
+      {/* 3. Hero Center Content: Compact on Mobile, Grand on Desktop */}
+      <div className="relative z-10 px-4 sm:px-10 py-4 sm:py-8 max-w-5xl mx-auto flex flex-col items-center text-center space-y-3 sm:space-y-4 my-auto">
+        <span className={`inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm transition-all animate-in fade-in duration-300 ${currentMode.badgeColor}`}>
+          <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+          <span className="line-clamp-1">{currentMode.tag}</span>
         </span>
 
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight text-white drop-shadow-xl max-w-4xl transition-all duration-300">
+        <h1 className="text-xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-white drop-shadow-xl max-w-md sm:max-w-4xl transition-all duration-300 line-clamp-2 sm:line-clamp-none">
           {currentMode.headline}
         </h1>
 
-        <p className="text-xs sm:text-base text-gray-100 max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow-md">
+        {/* Supporting description: hidden on mobile so background video is visible and not suffocated in text; 100% visible on desktop */}
+        <p className="hidden sm:block text-xs sm:text-base text-gray-100 max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow-md">
           {currentMode.subline}
         </p>
 
         {/* Floating Search Bar */}
         <form
           onSubmit={handleSearchSubmit}
-          className="w-full max-w-2xl relative flex items-center bg-white rounded-2xl sm:rounded-full p-2 shadow-2xl border-2 border-white/95 focus-within:ring-4 focus-within:ring-emerald-400/40 transition-all mt-1"
+          className="w-full max-w-2xl relative flex items-center bg-white rounded-xl sm:rounded-full p-1.5 sm:p-2 shadow-2xl border-2 border-white/95 focus-within:ring-4 focus-within:ring-emerald-400/40 transition-all mt-1"
         >
-          <Search className="w-5 h-5 text-gray-400 ml-3 flex-shrink-0" />
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 ml-2.5 sm:ml-3 flex-shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search fresh groceries, OYO hotel rooms, smartphones, kurtas, snacks..."
-            className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-500 font-bold bg-transparent outline-none"
+            placeholder="Search groceries, stays, mobiles, snacks..."
+            className="w-full px-2.5 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-500 font-bold bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-6 py-2.5 bg-gradient-to-r from-[#1B4332] to-[#2D6A4F] hover:from-[#2D6A4F] hover:to-[#40916C] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-full shadow-md transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
+            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-[#1B4332] to-[#2D6A4F] hover:from-[#2D6A4F] hover:to-[#40916C] text-white font-black text-xs sm:text-sm rounded-lg sm:rounded-full shadow-md transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
           >
             <span>Search</span>
             <ArrowRight className="w-4 h-4 hidden sm:inline" />
@@ -332,26 +334,26 @@ export const HomeVideoHero = () => {
         </form>
 
         {/* Quick Action CTAs */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 pt-1">
           <Link
             to={currentMode.primaryLink}
-            className="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-gray-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-gray-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
           >
             <span>{currentMode.primaryCta}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Link>
 
           <Link
             to={currentMode.secondaryLink}
-            className="px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-extrabold text-xs sm:text-sm rounded-xl border border-white/30 transition cursor-pointer"
+            className="hidden sm:inline-flex px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-extrabold text-xs sm:text-sm rounded-xl border border-white/30 transition cursor-pointer"
           >
             {currentMode.secondaryCta}
           </Link>
         </div>
       </div>
 
-      {/* 4. Category Showcase Tiles at Bottom of Hero */}
-      <div className="relative z-10 w-full px-4 sm:px-8 pb-6 max-w-6xl mx-auto">
+      {/* 4. Category Showcase Tiles at Bottom of Hero - Visible on Desktop/Tablet, Clean on Mobile */}
+      <div className="hidden sm:block relative z-10 w-full px-4 sm:px-8 pb-6 max-w-6xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 text-left">
           {showcaseCategories.map((cat) => {
             const IconComp = cat.icon;
